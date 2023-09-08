@@ -1,5 +1,5 @@
-# Make sure it matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.2.0
+# Use the desired Ruby version, matching what's specified in .ruby-version and Gemfile
+ARG RUBY_VERSION=3.1.2
 FROM ruby:$RUBY_VERSION
 
 # Install libvips for Active Storage preview support
@@ -17,6 +17,9 @@ ENV RAILS_LOG_TO_STDOUT="1" \
     RAILS_ENV="production" \
     BUNDLE_WITHOUT="development"
 
+# Install Bundler 2.3.6
+RUN gem install bundler:2.3.6
+
 # Install application gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
@@ -28,7 +31,7 @@ COPY . .
 RUN bundle exec bootsnap precompile --gemfile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+# RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
